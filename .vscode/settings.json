@@ -1,0 +1,8 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^type backend\\\\server\\.js ; echo \"---\" ; type frontend\\\\\\.env\\.local$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

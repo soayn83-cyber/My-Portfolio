@@ -1,0 +1,1 @@
+ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS main_text TEXT; ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS sub_text TEXT;

@@ -1,0 +1,144 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* Base: #FFFBF0 (cream white), Accent: #E8CCD7 (soft pink), Text: #6C6C6A (warm gray) */
+  --background: #FFFBF0;
+  --foreground: #6C6C6A;
+  --card: #FFFBF0;
+  --card-foreground: #6C6C6A;
+  --popover: #FFFBF0;
+  --popover-foreground: #6C6C6A;
+  --primary: #E8CCD7; /* soft pink for icons and accents */
+  --primary-foreground: #4A4A48; /* darker gray for contrast on pink */
+  --secondary: #F5F0E6; /* slightly darker cream */
+  --secondary-foreground: #6C6C6A;
+  --muted: #EDE8DE; /* muted cream */
+  --muted-foreground: #8A8A88; /* lighter gray */
+  --accent: #E8CCD7; /* soft pink */
+  --accent-foreground: #4A4A48;
+  --destructive: #E57373;
+  --destructive-foreground: #FFFBF0;
+  --border: #DDD8CE; /* subtle warm border */
+  --input: #F5F0E6;
+  --ring: #E8CCD7;
+  --chart-1: #E8CCD7;
+  --chart-2: #B8A9C9;
+  --chart-3: #A8D5BA;
+  --chart-4: #F5D6A8;
+  --chart-5: #F5A8A8;
+  --radius: 0.625rem;
+  --sidebar: #FFFBF0;
+  --sidebar-foreground: #6C6C6A;
+  --sidebar-primary: #E8CCD7;
+  --sidebar-primary-foreground: #4A4A48;
+  --sidebar-accent: #F5F0E6;
+  --sidebar-accent-foreground: #6C6C6A;
+  --sidebar-border: #DDD8CE;
+  --sidebar-ring: #E8CCD7;
+}
+
+.dark {
+  --background: #2A2A28;
+  --foreground: #E8E6E2;
+  --card: #2A2A28;
+  --card-foreground: #E8E6E2;
+  --popover: #2A2A28;
+  --popover-foreground: #E8E6E2;
+  --primary: #E8CCD7;
+  --primary-foreground: #2A2A28;
+  --secondary: #3A3A38;
+  --secondary-foreground: #E8E6E2;
+  --muted: #3A3A38;
+  --muted-foreground: #A8A8A6;
+  --accent: #E8CCD7;
+  --accent-foreground: #2A2A28;
+  --destructive: #E57373;
+  --destructive-foreground: #2A2A28;
+  --border: #4A4A48;
+  --input: #3A3A38;
+  --ring: #E8CCD7;
+  --chart-1: #E8CCD7;
+  --chart-2: #B8A9C9;
+  --chart-3: #A8D5BA;
+  --chart-4: #F5D6A8;
+  --chart-5: #F5A8A8;
+  --sidebar: #2A2A28;
+  --sidebar-foreground: #E8E6E2;
+  --sidebar-primary: #E8CCD7;
+  --sidebar-primary-foreground: #2A2A28;
+  --sidebar-accent: #3A3A38;
+  --sidebar-accent-foreground: #E8E6E2;
+  --sidebar-border: #4A4A48;
+  --sidebar-ring: #E8CCD7;
+}
+
+@theme inline {
+  --font-sans: 'Quicksand', 'Quicksand Fallback', sans-serif;
+  --font-serif: 'Cormorant Garamond', 'Cormorant Garamond Fallback', serif;
+  --font-mono: 'Geist Mono', 'Geist Mono Fallback';
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Heart cursor trail animation */
+@keyframes heart-float {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -100%) scale(0.5);
+  }
+}
+
+.heart-particle {
+  animation: heart-float 1s ease-out forwards;
+  pointer-events: none;
+}

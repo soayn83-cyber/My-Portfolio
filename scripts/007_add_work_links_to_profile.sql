@@ -1,0 +1,1 @@
+ALTER TABLE profile ADD COLUMN IF NOT EXISTS work_links JSONB DEFAULT '[]'::jsonb;

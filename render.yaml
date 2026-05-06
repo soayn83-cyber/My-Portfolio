@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: soayhyeon05-web
+    env: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/status
+    autoDeploy: true
