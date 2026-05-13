@@ -105,7 +105,7 @@
         "transform": "lodash/{{member}}"
       }
     },
-    "outputFileTracingRoot": "C:\\Users\\KUMA_LAB\\Documents\\soayhyeon05",
+    "outputFileTracingRoot": "C:\\Users\\KUMA_LAB\\Documents\\soayhyeon05\\frontend",
     "cacheComponents": false,
     "cacheLife": {
       "default": {
@@ -308,12 +308,12 @@
     "bundlePagesRouterDependencies": false,
     "configFileName": "next.config.mjs",
     "turbopack": {
-      "root": "C:\\Users\\KUMA_LAB\\Documents\\soayhyeon05"
+      "root": "C:\\Users\\KUMA_LAB\\Documents\\soayhyeon05\\frontend"
     },
     "distDirRoot": ".next"
   },
   "appDir": "C:\\Users\\KUMA_LAB\\Documents\\soayhyeon05\\frontend",
-  "relativeAppDir": "frontend",
+  "relativeAppDir": "",
   "files": [
     ".next\\routes-manifest.json",
     ".next\\server\\pages-manifest.json",

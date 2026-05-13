@@ -1,0 +1,8 @@
+
+> kkomeu-studio@1.0.0 start
+> node backend/server.js
+
+▲ Next.js 16.2.0
+- Local:         http://localhost:10000
+- Network:       http://0.0.0.0:10000
+✓ Ready in 0ms
