@@ -3,6 +3,7 @@ services:
     name: soayhyeon05-web
     env: node
     plan: free
+    branch: main
     rootDir: backend
     buildCommand: npm install
     startCommand: npm start
