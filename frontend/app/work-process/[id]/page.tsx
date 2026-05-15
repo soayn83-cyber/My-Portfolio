@@ -1,6 +1,8 @@
 import { PostDetail } from "@/components/post-detail"
 import { notFound } from "next/navigation"
-import { getCommentsForPost, getPostById } from "@/lib/site-data"
+import { getCommentsForPost, getPostById } from "@/lib/content-data"
+
+export const dynamic = "force-dynamic"
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -8,13 +10,13 @@ interface PageProps {
 
 export default async function WorkProcessDetailPage({ params }: PageProps) {
   const { id } = await params
-  const post = getPostById(id)
+  const post = await getPostById(id)
 
   if (!post) {
     notFound()
   }
 
-  const comments = getCommentsForPost(id)
+  const comments = await getCommentsForPost(id)
 
   return (
     <PostDetail

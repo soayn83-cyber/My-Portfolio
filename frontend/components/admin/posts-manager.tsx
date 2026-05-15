@@ -11,6 +11,7 @@ import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
 import { ArrowDown, ArrowUp, Pencil, Plus, Trash2, X } from "lucide-react"
 import type { EpisodeLink, Post, WorkStep } from "@/lib/site-data"
+import { deletePost, savePost, swapPostOrder } from "@/app/admin/actions"
 
 const categories = [
   { value: "webtoon", label: "Webtoon" },
@@ -81,6 +82,7 @@ function parseJsonArray<T>(value: string, fallback: T[]): T[] {
 export function PostsManager({ posts: initialPosts, defaultCategory = "webtoon" }: { posts: Post[], defaultCategory?: string }) {
   const [posts, setPosts] = useState(() => sortPosts(initialPosts))
   const [isCreating, setIsCreating] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [draft, setDraft] = useState<DraftPost>(() => emptyDraft(defaultCategory))
   const [notice, setNotice] = useState<string | null>(null)
@@ -120,7 +122,9 @@ export function PostsManager({ posts: initialPosts, defaultCategory = "webtoon" 
     setDraft(emptyDraft(defaultCategory))
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    setIsSaving(true)
+
     const now = new Date().toISOString()
     const images = parseLines(draft.imagesText)
     const episodes = parseJsonArray<EpisodeLink>(draft.episodesText, [])
@@ -143,25 +147,31 @@ export function PostsManager({ posts: initialPosts, defaultCategory = "webtoon" 
       work_steps: workSteps.length > 0 ? workSteps : null,
     }
 
+    const saveResult = await savePost(nextPost)
+
     setPosts((previous) => {
       const withoutEdited = previous.filter((post) => post.id !== nextPost.id)
       return sortPosts([nextPost, ...withoutEdited])
     })
 
-    setNotice(editingId ? "Post updated locally." : "Post created locally.")
+    setNotice(saveResult.success ? (editingId ? "Post saved to Supabase." : "Post created in Supabase.") : `${saveResult.error || "Supabase save failed."} Local state was updated.`)
     cancelEdit()
+    setIsSaving(false)
   }
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (!window.confirm("이 항목을 정말 삭제하시겠습니까?")) {
       return
     }
 
+    setIsSaving(true)
+    const result = await deletePost(id)
     setPosts((previous) => previous.filter((post) => post.id !== id))
-    setNotice("Post removed locally.")
+    setNotice(result.success ? "Post deleted from Supabase." : `${result.error || "Supabase delete failed."} Local state was updated.`)
+    setIsSaving(false)
   }
 
-  const handleSwapOrder = (post: Post, direction: "up" | "down") => {
+  const handleSwapOrder = async (post: Post, direction: "up" | "down") => {
     const categoryPosts = currentPosts.filter((item) => item.category === post.category)
     const currentIndex = categoryPosts.findIndex((item) => item.id === post.id)
     const targetIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1
@@ -173,6 +183,9 @@ export function PostsManager({ posts: initialPosts, defaultCategory = "webtoon" 
     const targetPost = categoryPosts[targetIndex]
     const nextDate = targetPost.created_at
     const targetDate = post.created_at
+
+    setIsSaving(true)
+    const result = await swapPostOrder(post.id, nextDate, targetPost.id, targetDate)
 
     setPosts((previous) =>
       previous.map((item) => {
@@ -187,6 +200,9 @@ export function PostsManager({ posts: initialPosts, defaultCategory = "webtoon" 
         return item
       }),
     )
+
+    setNotice(result.success ? "Order updated in Supabase." : `${result.error || "Supabase reorder failed."} Local state was updated.`)
+    setIsSaving(false)
   }
 
   return (
@@ -342,10 +358,10 @@ export function PostsManager({ posts: initialPosts, defaultCategory = "webtoon" 
             </div>
 
             <div className="flex gap-3">
-              <Button onClick={handleSave} className="bg-primary text-primary-foreground hover:bg-primary/90">
-                Save locally
+              <Button onClick={handleSave} className="bg-primary text-primary-foreground hover:bg-primary/90" disabled={isSaving}>
+                {isSaving ? "Saving..." : "Save"}
               </Button>
-              <Button variant="outline" onClick={cancelEdit}>
+              <Button variant="outline" onClick={cancelEdit} disabled={isSaving}>
                 Cancel
               </Button>
             </div>
@@ -376,19 +392,19 @@ export function PostsManager({ posts: initialPosts, defaultCategory = "webtoon" 
               </div>
 
               <div className="flex flex-wrap gap-2">
-                <Button variant="outline" size="sm" onClick={() => handleSwapOrder(post, "up")} disabled={index === 0}>
+                <Button variant="outline" size="sm" onClick={() => handleSwapOrder(post, "up")} disabled={index === 0 || isSaving}>
                   <ArrowUp className="mr-2 h-4 w-4" />
                   Up
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => handleSwapOrder(post, "down")} disabled={index === currentPosts.length - 1}>
+                <Button variant="outline" size="sm" onClick={() => handleSwapOrder(post, "down")} disabled={index === currentPosts.length - 1 || isSaving}>
                   <ArrowDown className="mr-2 h-4 w-4" />
                   Down
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => beginEdit(post)}>
+                <Button variant="outline" size="sm" onClick={() => beginEdit(post)} disabled={isSaving}>
                   <Pencil className="mr-2 h-4 w-4" />
                   Edit
                 </Button>
-                <Button variant="destructive" size="sm" onClick={() => handleDelete(post.id)}>
+                <Button variant="destructive" size="sm" onClick={() => handleDelete(post.id)} disabled={isSaving}>
                   <Trash2 className="mr-2 h-4 w-4" />
                   Delete
                 </Button>

@@ -1,9 +1,11 @@
 import { WorkProcessList } from "@/components/work-process-list"
 import { PageHeader } from "@/components/page-header"
-import { getPosts } from "@/lib/site-data"
+import { getPosts } from "@/lib/content-data"
+
+export const dynamic = "force-dynamic"
 
 export default async function WorkProcessPage() {
-  const posts = getPosts("work_process")
+  const posts = await getPosts("work_process")
 
   return (
     <div className="min-h-screen bg-background py-8">

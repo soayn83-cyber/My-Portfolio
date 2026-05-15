@@ -1,8 +1,10 @@
 import { HomeHero } from "@/components/home-hero"
-import { getSiteConfig } from "@/lib/site-data"
+import { getSiteConfig } from "@/lib/content-data"
+
+export const dynamic = "force-dynamic"
 
 export default async function HomePage() {
-  const { heroImageUrl, logoUrl, mainText, subText, siteName } = getSiteConfig()
+  const { heroImageUrl, logoUrl, mainText, subText, siteName } = await getSiteConfig()
 
   return (
     <HomeHero 

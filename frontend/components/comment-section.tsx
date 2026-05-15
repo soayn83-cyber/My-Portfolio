@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { MessageCircle, Trash2 } from "lucide-react"
 import type { Comment } from "@/lib/site-data"
+import { deleteComment, saveComment } from "@/app/admin/actions"
 
 interface CommentSectionProps {
   postId: string
@@ -19,6 +20,7 @@ export function CommentSection({ postId, initialComments }: CommentSectionProps)
   const [deletePassword, setDeletePassword] = useState("")
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   
   const [formData, setFormData] = useState({
     author_name: "",
@@ -29,9 +31,11 @@ export function CommentSection({ postId, initialComments }: CommentSectionProps)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
+    setIsSubmitting(true)
 
     if (!formData.author_name.trim() || !formData.password.trim() || !formData.content.trim()) {
       setError("Please fill out all fields.")
+      setIsSubmitting(false)
       return
     }
 
@@ -43,8 +47,14 @@ export function CommentSection({ postId, initialComments }: CommentSectionProps)
       deleteKey: formData.password.trim(),
     }
 
+    const result = await saveComment(postId, newComment.author_name, newComment.content, formData.password.trim())
+
     setComments((prev) => [...prev, newComment])
     setFormData({ author_name: "", password: "", content: "" })
+    if (!result.success) {
+      setError(result.error || "Comment saved locally only.")
+    }
+    setIsSubmitting(false)
   }
 
   const handleDelete = async (commentId: string) => {
@@ -59,15 +69,16 @@ export function CommentSection({ postId, initialComments }: CommentSectionProps)
       return
     }
 
-    if (target.deleteKey !== deletePassword) {
+    if (target.deleteKey && target.deleteKey !== deletePassword) {
       setError("Invalid password")
       return
     }
 
+    const result = await deleteComment(commentId, deletePassword)
     setComments((prev) => prev.filter((comment) => comment.id !== commentId))
     setDeletingId(null)
     setDeletePassword("")
-    setError(null)
+    setError(result.success || target.deleteKey ? null : result.error || "Comment deleted locally only.")
   }
 
   return (
@@ -125,8 +136,9 @@ export function CommentSection({ postId, initialComments }: CommentSectionProps)
         <Button 
           type="submit" 
           className="bg-primary text-primary-foreground hover:bg-primary/90"
+          disabled={isSubmitting}
         >
-          Post Comment
+          {isSubmitting ? "Posting..." : "Post Comment"}
         </Button>
       </form>
 

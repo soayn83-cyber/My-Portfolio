@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Upload, X } from "lucide-react"
 import type { SiteConfig } from "@/lib/site-data"
+import { saveSiteSettings } from "@/app/admin/actions"
 
 interface SiteSettingsManagerProps {
   settings: SiteConfig | null
@@ -56,8 +57,17 @@ export function SiteSettingsManager({ settings }: SiteSettingsManagerProps) {
     setIsLoading(true)
 
     try {
+      const result = await saveSiteSettings({
+        siteName: formData.siteTitle,
+        mainText: formData.mainText,
+        subText: formData.subText,
+        logoUrl: formData.siteLogoUrl || null,
+        heroImageUrl: formData.heroImageUrl || null,
+        profileImageUrl: formData.profileImageUrl || null,
+      })
+
       console.info("Site settings updated locally", formData)
-      setMessage("메인 페이지 설정이 로컬 상태에 반영되었습니다.")
+      setMessage(result.success ? "메인 페이지 설정이 Supabase에 저장되었습니다." : `${result.error || "Supabase save failed."} 로컬 상태는 유지됩니다.`)
     } finally {
       setIsLoading(false)
     }

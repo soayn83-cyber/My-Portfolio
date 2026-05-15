@@ -1,9 +1,11 @@
 import { WebtoonList } from "@/components/webtoon-list"
 import { PageHeader } from "@/components/page-header"
-import { getPosts } from "@/lib/site-data"
+import { getPosts } from "@/lib/content-data"
+
+export const dynamic = "force-dynamic"
 
 export default async function WebtoonPage() {
-  const posts = getPosts("webtoon")
+  const posts = await getPosts("webtoon")
 
   return (
     <div className="min-h-screen bg-background py-8">

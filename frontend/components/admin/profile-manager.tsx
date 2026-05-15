@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Plus, Upload, X } from "lucide-react"
 import type { Profile, ProfileItem, WorkLink } from "@/lib/site-data"
+import { saveProfile } from "@/app/admin/actions"
 
 interface ProfileManagerProps {
   profile: Profile | null
@@ -84,8 +85,13 @@ export function ProfileManager({ profile }: ProfileManagerProps) {
         work_links: safeJson<WorkLink[]>(formData.work_links, []),
       }
 
+      const result = await saveProfile({
+        id: profile?.id || "profile-local",
+        ...nextProfile,
+      })
+
       console.info("Profile data updated locally", nextProfile)
-      setSavedMessage("프로필 설정이 로컬 상태에 반영되었습니다.")
+      setSavedMessage(result.success ? "프로필 설정이 Supabase에 저장되었습니다." : `${result.error || "Supabase save failed."} 로컬 상태는 유지됩니다.`)
     } finally {
       setIsLoading(false)
     }

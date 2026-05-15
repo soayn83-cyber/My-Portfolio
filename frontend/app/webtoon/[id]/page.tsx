@@ -1,6 +1,8 @@
 import { PostDetail } from "@/components/post-detail"
 import { notFound } from "next/navigation"
-import { getCommentsForPost, getPostById } from "@/lib/site-data"
+import { getCommentsForPost, getPostById } from "@/lib/content-data"
+
+export const dynamic = "force-dynamic"
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -12,7 +14,7 @@ export default async function WebtoonDetailPage({ params, searchParams }: PagePr
   const resolvedSearchParams = await searchParams;
   const episodeIndex = resolvedSearchParams.episode ? parseInt(resolvedSearchParams.episode, 10) : undefined;
 
-  const post = getPostById(id);
+  const post = await getPostById(id);
 
   if (!post) {
     notFound();
@@ -29,7 +31,7 @@ export default async function WebtoonDetailPage({ params, searchParams }: PagePr
     }
   }
 
-  const comments = getCommentsForPost(id);
+  const comments = await getCommentsForPost(id);
 
   return (
     <PostDetail

@@ -1,7 +1,9 @@
 import { redirect } from "next/navigation"
 import { cookies } from "next/headers"
 import { AdminDashboard } from "@/components/admin/admin-dashboard"
-import { getPosts, getProfile, getSiteConfig } from "@/lib/site-data"
+import { getAllPosts, getProfile, getSiteConfig } from "@/lib/content-data"
+
+export const dynamic = "force-dynamic"
 
 export default async function AdminPage() {
   const cookieStore = await cookies()
@@ -12,9 +14,9 @@ export default async function AdminPage() {
   }
 
   const user = { email: "admin@local" }
-  const posts = getPosts()
-  const settings = getSiteConfig()
-  const profile = getProfile()
+  const posts = await getAllPosts()
+  const settings = await getSiteConfig()
+  const profile = await getProfile()
 
   return (
     <AdminDashboard

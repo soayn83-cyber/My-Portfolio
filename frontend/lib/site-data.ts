@@ -197,6 +197,10 @@ export function getPosts(category?: string): Post[] {
   return clone(filtered.filter((post) => post.is_published).sort((left, right) => right.created_at.localeCompare(left.created_at)))
 }
 
+export function getAllPosts(): Post[] {
+  return clone([...posts].sort((left, right) => right.created_at.localeCompare(left.created_at)))
+}
+
 export function getPostById(id: string): Post | null {
   const post = posts.find((item) => item.id === id && item.is_published)
   return post ? clone(post) : null
