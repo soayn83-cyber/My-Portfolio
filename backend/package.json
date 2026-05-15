@@ -4,7 +4,7 @@
   "description": "Node.js Backend Server",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "npm --prefix ../frontend start",
     "build": "npm --prefix ../frontend run build",
     "postinstall": "npm --prefix ../frontend install --include=dev && npm --prefix ../frontend run build",
     "dev": "nodemon dev-server.js"

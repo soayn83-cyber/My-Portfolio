@@ -26,6 +26,24 @@ function copyDir(sourcePath, targetPath) {
   fs.cpSync(sourcePath, targetPath, { recursive: true });
 }
 
+function forceStandaloneHost(standaloneDir) {
+  const standaloneServerPath = path.join(standaloneDir, 'server.js');
+
+  if (!fs.existsSync(standaloneServerPath)) {
+    return;
+  }
+
+  const standaloneServerSource = fs.readFileSync(standaloneServerPath, 'utf8');
+  const patchedStandaloneServerSource = standaloneServerSource.replace(
+    "const hostname = process.env.HOSTNAME || '0.0.0.0'",
+    "const hostname = '0.0.0.0'"
+  );
+
+  if (patchedStandaloneServerSource !== standaloneServerSource) {
+    fs.writeFileSync(standaloneServerPath, patchedStandaloneServerSource);
+  }
+}
+
 function ensureRuntimeAssets(standaloneDir) {
   const standaloneNextDir = path.join(standaloneDir, '.next');
   const staticTargetDir = path.join(standaloneNextDir, 'static');
@@ -56,6 +74,8 @@ if (!fs.existsSync(sourceStandaloneDir)) {
 
 copyDir(sourceStandaloneDir, path.join(frontendDistDir, 'standalone'));
 ensureRuntimeAssets(path.join(frontendDistDir, 'standalone'));
+forceStandaloneHost(path.join(frontendDistDir, 'standalone'));
 copyDir(frontendDistDir, backendDistDir);
+forceStandaloneHost(path.join(backendDistDir, 'standalone'));
 
 console.log('Frontend build output copied to frontend/dist and backend/dist');
