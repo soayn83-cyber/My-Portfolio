@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "build": "npm --prefix frontend install && npm --prefix frontend run build",
-    "start": "npm --prefix frontend start",
+    "start": "node backend/server.js",
     "postinstall": "npm --prefix backend install"
   }
 }
