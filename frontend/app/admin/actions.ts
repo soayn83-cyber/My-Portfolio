@@ -1,6 +1,7 @@
 "use server"
 
 import bcrypt from "bcryptjs"
+import { randomUUID } from "node:crypto"
 import { revalidatePath } from "next/cache"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
 import { persistDataUrlAsPublicUrl } from "@/lib/supabase/storage"
@@ -35,6 +36,10 @@ function notConfigured(): ActionResult {
 
 function isMissingLegacyPostSchema(error: Error) {
   return /updated_at|schema cache/i.test(error.message)
+}
+
+function isUuid(value: string) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value)
 }
 
 type SavedSiteSettings = {
@@ -171,20 +176,21 @@ export async function savePost(post: Post): Promise<ActionResult<Post>> {
     return notConfigured()
   }
 
-  const thumbnailUrl = await persistDataUrlAsPublicUrl(client, post.thumbnail_url, `posts/${post.id}/thumbnail`)
-  const pdfUrl = await persistDataUrlAsPublicUrl(client, post.pdf_url, `posts/${post.id}/pdf`)
+  const savedId = isUuid(post.id) ? post.id : randomUUID()
+  const thumbnailUrl = await persistDataUrlAsPublicUrl(client, post.thumbnail_url, `posts/${savedId}/thumbnail`)
+  const pdfUrl = await persistDataUrlAsPublicUrl(client, post.pdf_url, `posts/${savedId}/pdf`)
   const images = await Promise.all(
-    (post.images ?? []).map((imageUrl, index) => persistDataUrlAsPublicUrl(client, imageUrl, `posts/${post.id}/images/${index + 1}`)),
+    (post.images ?? []).map((imageUrl, index) => persistDataUrlAsPublicUrl(client, imageUrl, `posts/${savedId}/images/${index + 1}`)),
   )
   const workSteps = await Promise.all(
     (post.work_steps ?? []).map(async (step, index) => ({
       ...step,
-      image_url: await persistDataUrlAsPublicUrl(client, step.image_url, `posts/${post.id}/work-steps/${index + 1}`),
+      image_url: await persistDataUrlAsPublicUrl(client, step.image_url, `posts/${savedId}/work-steps/${index + 1}`),
     })),
   )
 
   const payload = {
-    id: post.id,
+    id: savedId,
     category: post.category,
     title: normalizeText(post.title) ?? "Untitled",
     description: buildNullishString(post.description),
@@ -202,7 +208,7 @@ export async function savePost(post: Post): Promise<ActionResult<Post>> {
   }
 
   const legacyPayload = {
-    id: post.id,
+    id: savedId,
     category: post.category,
     title: normalizeText(post.title) ?? "Untitled",
     description: buildNullishString(post.description),
@@ -225,7 +231,7 @@ export async function savePost(post: Post): Promise<ActionResult<Post>> {
 
     if (!legacyError) {
       refreshContent()
-      return { success: true, data: { ...post, thumbnail_url: thumbnailUrl, images, pdf_url: pdfUrl, work_steps: workSteps } }
+      return { success: true, data: { ...post, id: savedId, thumbnail_url: thumbnailUrl, images, pdf_url: pdfUrl, work_steps: workSteps } }
     }
 
     return { success: false, error: legacyError.message }
@@ -240,6 +246,7 @@ export async function savePost(post: Post): Promise<ActionResult<Post>> {
     success: true,
     data: {
       ...post,
+      id: savedId,
       thumbnail_url: thumbnailUrl,
       images,
       pdf_url: pdfUrl,
