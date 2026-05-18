@@ -2,7 +2,7 @@ import { Buffer } from "node:buffer"
 import { randomUUID } from "node:crypto"
 import type { SupabaseClient } from "@supabase/supabase-js"
 
-const DEFAULT_STORAGE_BUCKET = process.env.SUPABASE_STORAGE_BUCKET || "portfolio-assets"
+const DEFAULT_STORAGE_BUCKET = process.env.SUPABASE_STORAGE_BUCKET || "uploads"
 const DATA_URL_PATTERN = /^data:([^;]+);base64,(.+)$/s
 
 type DataUrlPayload = {
