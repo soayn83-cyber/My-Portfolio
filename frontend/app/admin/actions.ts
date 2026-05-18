@@ -3,11 +3,13 @@
 import bcrypt from "bcryptjs"
 import { revalidatePath } from "next/cache"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
+import { persistDataUrlAsPublicUrl } from "@/lib/supabase/storage"
 import type { Post, Profile, SiteConfig } from "@/lib/site-data"
 
-type ActionResult = {
+type ActionResult<T = void> = {
   success: boolean
   error?: string
+  data?: T
 }
 
 function refreshContent() {
@@ -35,7 +37,16 @@ function isMissingLegacyPostSchema(error: Error) {
   return /updated_at|schema cache/i.test(error.message)
 }
 
-export async function saveSiteSettings(settings: SiteConfig): Promise<ActionResult> {
+type SavedSiteSettings = {
+  siteName: string
+  mainText: string | null
+  subText: string | null
+  logoUrl: string | null
+  heroImageUrl: string | null
+  profileImageUrl: string | null
+}
+
+export async function saveSiteSettings(settings: SiteConfig): Promise<ActionResult<SavedSiteSettings>> {
   const client = createSupabaseServerClient()
 
   if (!client) {
@@ -44,18 +55,18 @@ export async function saveSiteSettings(settings: SiteConfig): Promise<ActionResu
 
   const payload = {
     site_name: normalizeText(settings.siteName) ?? "Portfolio",
-    site_logo_url: buildNullishString(settings.logoUrl),
-    hero_image_url: buildNullishString(settings.heroImageUrl),
+    site_logo_url: await persistDataUrlAsPublicUrl(client, settings.logoUrl, "site-settings/logo"),
+    hero_image_url: await persistDataUrlAsPublicUrl(client, settings.heroImageUrl, "site-settings/hero"),
     main_text: normalizeText(settings.mainText),
     sub_text: normalizeText(settings.subText),
-    profile_image_url: buildNullishString(settings.profileImageUrl),
+    profile_image_url: await persistDataUrlAsPublicUrl(client, settings.profileImageUrl, "site-settings/profile"),
     updated_at: new Date().toISOString(),
   }
 
   const legacyPayload = {
     site_name: normalizeText(settings.siteName) ?? "Portfolio",
-    site_logo_url: buildNullishString(settings.logoUrl),
-    hero_image_url: buildNullishString(settings.heroImageUrl),
+    site_logo_url: payload.site_logo_url,
+    hero_image_url: payload.hero_image_url,
     hero_text: normalizeText(settings.mainText) ?? normalizeText(settings.subText),
     updated_at: payload.updated_at,
   }
@@ -86,10 +97,20 @@ export async function saveSiteSettings(settings: SiteConfig): Promise<ActionResu
   }
 
   refreshContent()
-  return { success: true }
+  return {
+    success: true,
+    data: {
+      siteName: payload.site_name,
+      mainText: payload.main_text,
+      subText: payload.sub_text,
+      logoUrl: payload.site_logo_url,
+      heroImageUrl: payload.hero_image_url,
+      profileImageUrl: payload.profile_image_url,
+    },
+  }
 }
 
-export async function saveProfile(profile: Profile): Promise<ActionResult> {
+export async function saveProfile(profile: Profile): Promise<ActionResult<Profile>> {
   const client = createSupabaseServerClient()
 
   if (!client) {
@@ -99,7 +120,7 @@ export async function saveProfile(profile: Profile): Promise<ActionResult> {
   const payload = {
     name: normalizeText(profile.name),
     bio: normalizeText(profile.bio),
-    profile_image_url: buildNullishString(profile.profile_image_url),
+    profile_image_url: await persistDataUrlAsPublicUrl(client, profile.profile_image_url, "profile/image"),
     contact_email: normalizeText(profile.contact_email),
     social_links: profile.social_links ?? {},
     experience: profile.experience ?? [],
@@ -126,32 +147,58 @@ export async function saveProfile(profile: Profile): Promise<ActionResult> {
   }
 
   refreshContent()
-  return { success: true }
+  return {
+    success: true,
+    data: {
+      id: profile.id,
+      name: payload.name,
+      bio: payload.bio,
+      profile_image_url: payload.profile_image_url,
+      contact_email: payload.contact_email,
+      social_links: payload.social_links,
+      experience: payload.experience,
+      certifications: payload.certifications,
+      education: payload.education,
+      work_links: payload.work_links,
+    },
+  }
 }
 
-export async function savePost(post: Post): Promise<ActionResult> {
+export async function savePost(post: Post): Promise<ActionResult<Post>> {
   const client = createSupabaseServerClient()
 
   if (!client) {
     return notConfigured()
   }
 
+  const thumbnailUrl = await persistDataUrlAsPublicUrl(client, post.thumbnail_url, `posts/${post.id}/thumbnail`)
+  const pdfUrl = await persistDataUrlAsPublicUrl(client, post.pdf_url, `posts/${post.id}/pdf`)
+  const images = await Promise.all(
+    (post.images ?? []).map((imageUrl, index) => persistDataUrlAsPublicUrl(client, imageUrl, `posts/${post.id}/images/${index + 1}`)),
+  )
+  const workSteps = await Promise.all(
+    (post.work_steps ?? []).map(async (step, index) => ({
+      ...step,
+      image_url: await persistDataUrlAsPublicUrl(client, step.image_url, `posts/${post.id}/work-steps/${index + 1}`),
+    })),
+  )
+
   const payload = {
     id: post.id,
     category: post.category,
     title: normalizeText(post.title) ?? "Untitled",
     description: buildNullishString(post.description),
-    thumbnail_url: buildNullishString(post.thumbnail_url),
-    images: post.images ?? [],
+    thumbnail_url: thumbnailUrl,
+    images,
     is_published: post.is_published,
     created_at: post.created_at,
     updated_at: new Date().toISOString(),
     episodes: post.episodes ?? [],
-    pdf_url: buildNullishString(post.pdf_url),
+    pdf_url: pdfUrl,
     keywords: buildNullishString(post.keywords),
     production_date: buildNullishString(post.production_date),
     sub_category: buildNullishString(post.sub_category),
-    work_steps: post.work_steps ?? [],
+    work_steps,
   }
 
   const legacyPayload = {
@@ -159,16 +206,16 @@ export async function savePost(post: Post): Promise<ActionResult> {
     category: post.category,
     title: normalizeText(post.title) ?? "Untitled",
     description: buildNullishString(post.description),
-    thumbnail_url: buildNullishString(post.thumbnail_url),
-    images: post.images ?? [],
+    thumbnail_url: thumbnailUrl,
+    images,
     is_published: post.is_published,
     created_at: post.created_at,
     episodes: post.episodes ?? [],
-    pdf_url: buildNullishString(post.pdf_url),
+    pdf_url: pdfUrl,
     keywords: buildNullishString(post.keywords),
     production_date: buildNullishString(post.production_date),
     sub_category: buildNullishString(post.sub_category),
-    work_steps: post.work_steps ?? [],
+    work_steps,
   }
 
   const { error } = await client.from("posts").upsert(payload, { onConflict: "id" })
@@ -178,7 +225,7 @@ export async function savePost(post: Post): Promise<ActionResult> {
 
     if (!legacyError) {
       refreshContent()
-      return { success: true }
+      return { success: true, data: { ...post, thumbnail_url: thumbnailUrl, images, pdf_url: pdfUrl, work_steps } }
     }
 
     return { success: false, error: legacyError.message }
@@ -189,7 +236,16 @@ export async function savePost(post: Post): Promise<ActionResult> {
   }
 
   refreshContent()
-  return { success: true }
+  return {
+    success: true,
+    data: {
+      ...post,
+      thumbnail_url: thumbnailUrl,
+      images,
+      pdf_url: pdfUrl,
+      work_steps,
+    },
+  }
 }
 
 export async function deletePost(postId: string): Promise<ActionResult> {

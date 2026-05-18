@@ -98,6 +98,20 @@ export function ProfileManager({ profile }: ProfileManagerProps) {
       })
 
       console.info("Profile data updated locally", nextProfile)
+      if (result.success && result.data) {
+        setFormData((previous) => ({
+          ...previous,
+          name: result.data.name ?? "",
+          bio: result.data.bio ?? "",
+          profile_image_url: result.data.profile_image_url ?? "",
+          contact_email: result.data.contact_email ?? "",
+          social_links: formatJson(result.data.social_links ?? {}),
+          experience: formatJson(result.data.experience ?? []),
+          certifications: formatJson(result.data.certifications ?? []),
+          education: formatJson(result.data.education ?? []),
+          work_links: formatJson(result.data.work_links ?? []),
+        }))
+      }
       setSavedMessage(result.success ? "프로필 설정이 Supabase에 저장되었습니다." : `${result.error || "Supabase save failed."} 로컬 상태는 유지됩니다.`)
     } finally {
       setIsLoading(false)

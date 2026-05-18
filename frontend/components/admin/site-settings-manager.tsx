@@ -76,6 +76,17 @@ export function SiteSettingsManager({ settings }: SiteSettingsManagerProps) {
       })
 
       console.info("Site settings updated locally", formData)
+      if (result.success && result.data) {
+        setFormData((previous) => ({
+          ...previous,
+          siteTitle: result.data.siteName,
+          mainText: result.data.mainText ?? "",
+          subText: result.data.subText ?? "",
+          siteLogoUrl: result.data.logoUrl ?? "",
+          heroImageUrl: result.data.heroImageUrl ?? "",
+          profileImageUrl: result.data.profileImageUrl ?? "",
+        }))
+      }
       setMessage(result.success ? "메인 페이지 설정이 Supabase에 저장되었습니다." : `${result.error || "Supabase save failed."} 로컬 상태는 유지됩니다.`)
     } finally {
       setIsLoading(false)

@@ -149,10 +149,11 @@ export function PostsManager({ posts: initialPosts, defaultCategory = "webtoon" 
     }
 
     const saveResult = await savePost(nextPost)
+    const savedPost = saveResult.data ?? nextPost
 
     setPosts((previous) => {
-      const withoutEdited = previous.filter((post) => post.id !== nextPost.id)
-      return sortPosts([nextPost, ...withoutEdited])
+      const withoutEdited = previous.filter((post) => post.id !== savedPost.id)
+      return sortPosts([savedPost, ...withoutEdited])
     })
 
     setNotice(saveResult.success ? (editingId ? "Post saved to Supabase." : "Post created in Supabase.") : `${saveResult.error || "Supabase save failed."} Local state was updated.`)
