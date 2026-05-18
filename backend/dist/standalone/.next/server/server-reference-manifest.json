@@ -1,9 +1,69 @@
 {
   "node": {
+    "406bdba0b58dbe002ad800c44b79257984784d3547": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 82421,
+          "async": false,
+          "exportedName": "deletePost",
+          "filename": "app/admin/actions.ts"
+        }
+      },
+      "filename": "app/admin/actions.ts",
+      "exportedName": "deletePost"
+    },
+    "40d48d5d3031d7a52dc73eb0842f65fb756f1626d3": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 82421,
+          "async": false,
+          "exportedName": "savePost",
+          "filename": "app/admin/actions.ts"
+        }
+      },
+      "filename": "app/admin/actions.ts",
+      "exportedName": "savePost"
+    },
+    "78eeb0b99e88b703fdea1aa52c420bd250d334acad": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 82421,
+          "async": false,
+          "exportedName": "swapPostOrder",
+          "filename": "app/admin/actions.ts"
+        }
+      },
+      "filename": "app/admin/actions.ts",
+      "exportedName": "swapPostOrder"
+    },
+    "40287ade0696b013f027a05954ae172c97cab2815b": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 82421,
+          "async": false,
+          "exportedName": "saveSiteSettings",
+          "filename": "app/admin/actions.ts"
+        }
+      },
+      "filename": "app/admin/actions.ts",
+      "exportedName": "saveSiteSettings"
+    },
+    "40c86c5be051ee588ac9c8dca3cdd307c8cf4053b9": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 82421,
+          "async": false,
+          "exportedName": "saveProfile",
+          "filename": "app/admin/actions.ts"
+        }
+      },
+      "filename": "app/admin/actions.ts",
+      "exportedName": "saveProfile"
+    },
     "00b0c9417eb14aa0c684d9dd9b23e30b3f7fae05b5": {
       "workers": {
         "app/admin/page": {
-          "moduleId": 27447,
+          "moduleId": 82421,
           "async": false,
           "exportedName": "logoutAdmin",
           "filename": "app/admin/login/actions.ts"
@@ -23,6 +83,54 @@
       },
       "filename": "app/admin/login/actions.ts",
       "exportedName": "loginWithPassword"
+    },
+    "603110611444b5115e6a1fc767abacc6840af7511f": {
+      "workers": {
+        "app/illustration/[id]/page": {
+          "moduleId": 35157,
+          "async": false,
+          "exportedName": "deleteComment",
+          "filename": "app/admin/actions.ts"
+        },
+        "app/webtoon/[id]/page": {
+          "moduleId": 58101,
+          "async": false,
+          "exportedName": "deleteComment",
+          "filename": "app/admin/actions.ts"
+        },
+        "app/work-process/[id]/page": {
+          "moduleId": 63993,
+          "async": false,
+          "exportedName": "deleteComment",
+          "filename": "app/admin/actions.ts"
+        }
+      },
+      "filename": "app/admin/actions.ts",
+      "exportedName": "deleteComment"
+    },
+    "780571af014f6761a22b40e8838e7de0fe65394e5f": {
+      "workers": {
+        "app/illustration/[id]/page": {
+          "moduleId": 35157,
+          "async": false,
+          "exportedName": "saveComment",
+          "filename": "app/admin/actions.ts"
+        },
+        "app/webtoon/[id]/page": {
+          "moduleId": 58101,
+          "async": false,
+          "exportedName": "saveComment",
+          "filename": "app/admin/actions.ts"
+        },
+        "app/work-process/[id]/page": {
+          "moduleId": 63993,
+          "async": false,
+          "exportedName": "saveComment",
+          "filename": "app/admin/actions.ts"
+        }
+      },
+      "filename": "app/admin/actions.ts",
+      "exportedName": "saveComment"
     }
   },
   "edge": {},

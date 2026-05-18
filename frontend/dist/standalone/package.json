@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build && node ./scripts/sync-build.mjs",
-    "start": "next start",
+    "start": "next start -H 0.0.0.0",
     "lint": "eslint ."
   },
   "dependencies": {
@@ -13,6 +13,7 @@
     "@tailwindcss/postcss": "^4.2.0",
     "@vercel/analytics": "1.6.1",
     "@vercel/blob": "^0.27.1",
+    "@supabase/supabase-js": "^2.55.0",
     "bcryptjs": "^2.4.3",
     "framer-motion": "^11.18.0",
     "@radix-ui/react-accordion": "1.2.12",

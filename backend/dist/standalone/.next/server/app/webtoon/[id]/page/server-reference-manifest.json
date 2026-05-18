@@ -1,4 +1,29 @@
 {
-  "node": {},
+  "node": {
+    "603110611444b5115e6a1fc767abacc6840af7511f": {
+      "workers": {
+        "app/webtoon/[id]/page": {
+          "moduleId": 58101,
+          "async": false,
+          "exportedName": "deleteComment",
+          "filename": "app/admin/actions.ts"
+        }
+      },
+      "exportedName": "deleteComment",
+      "filename": "app/admin/actions.ts"
+    },
+    "780571af014f6761a22b40e8838e7de0fe65394e5f": {
+      "workers": {
+        "app/webtoon/[id]/page": {
+          "moduleId": 58101,
+          "async": false,
+          "exportedName": "saveComment",
+          "filename": "app/admin/actions.ts"
+        }
+      },
+      "exportedName": "saveComment",
+      "filename": "app/admin/actions.ts"
+    }
+  },
   "edge": {}
 }

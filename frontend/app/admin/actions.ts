@@ -31,6 +31,10 @@ function notConfigured(): ActionResult {
   }
 }
 
+function isMissingLegacyPostSchema(error: Error) {
+  return /updated_at|schema cache/i.test(error.message)
+}
+
 export async function saveSiteSettings(settings: SiteConfig): Promise<ActionResult> {
   const client = createSupabaseServerClient()
 
@@ -150,7 +154,35 @@ export async function savePost(post: Post): Promise<ActionResult> {
     work_steps: post.work_steps ?? [],
   }
 
+  const legacyPayload = {
+    id: post.id,
+    category: post.category,
+    title: normalizeText(post.title) ?? "Untitled",
+    description: buildNullishString(post.description),
+    thumbnail_url: buildNullishString(post.thumbnail_url),
+    images: post.images ?? [],
+    is_published: post.is_published,
+    created_at: post.created_at,
+    episodes: post.episodes ?? [],
+    pdf_url: buildNullishString(post.pdf_url),
+    keywords: buildNullishString(post.keywords),
+    production_date: buildNullishString(post.production_date),
+    sub_category: buildNullishString(post.sub_category),
+    work_steps: post.work_steps ?? [],
+  }
+
   const { error } = await client.from("posts").upsert(payload, { onConflict: "id" })
+
+  if (error && isMissingLegacyPostSchema(error)) {
+    const { error: legacyError } = await client.from("posts").upsert(legacyPayload, { onConflict: "id" })
+
+    if (!legacyError) {
+      refreshContent()
+      return { success: true }
+    }
+
+    return { success: false, error: legacyError.message }
+  }
 
   if (error) {
     return { success: false, error: error.message }
@@ -189,6 +221,24 @@ export async function swapPostOrder(postId: string, nextCreatedAt: string, targe
     client.from("posts").update({ created_at: nextCreatedAt, updated_at: updatedAt }).eq("id", postId),
     client.from("posts").update({ created_at: targetCreatedAt, updated_at: updatedAt }).eq("id", targetPostId),
   ])
+
+  if ((currentResult.error && isMissingLegacyPostSchema(currentResult.error)) || (targetResult.error && isMissingLegacyPostSchema(targetResult.error))) {
+    const [legacyCurrentResult, legacyTargetResult] = await Promise.all([
+      client.from("posts").update({ created_at: nextCreatedAt }).eq("id", postId),
+      client.from("posts").update({ created_at: targetCreatedAt }).eq("id", targetPostId),
+    ])
+
+    if (legacyCurrentResult.error) {
+      return { success: false, error: legacyCurrentResult.error.message }
+    }
+
+    if (legacyTargetResult.error) {
+      return { success: false, error: legacyTargetResult.error.message }
+    }
+
+    refreshContent()
+    return { success: true }
+  }
 
   if (currentResult.error) {
     return { success: false, error: currentResult.error.message }

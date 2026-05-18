@@ -1,9 +1,69 @@
 {
   "node": {
+    "406bdba0b58dbe002ad800c44b79257984784d3547": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 82421,
+          "async": false,
+          "exportedName": "deletePost",
+          "filename": "app/admin/actions.ts"
+        }
+      },
+      "exportedName": "deletePost",
+      "filename": "app/admin/actions.ts"
+    },
+    "40d48d5d3031d7a52dc73eb0842f65fb756f1626d3": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 82421,
+          "async": false,
+          "exportedName": "savePost",
+          "filename": "app/admin/actions.ts"
+        }
+      },
+      "exportedName": "savePost",
+      "filename": "app/admin/actions.ts"
+    },
+    "78eeb0b99e88b703fdea1aa52c420bd250d334acad": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 82421,
+          "async": false,
+          "exportedName": "swapPostOrder",
+          "filename": "app/admin/actions.ts"
+        }
+      },
+      "exportedName": "swapPostOrder",
+      "filename": "app/admin/actions.ts"
+    },
+    "40287ade0696b013f027a05954ae172c97cab2815b": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 82421,
+          "async": false,
+          "exportedName": "saveSiteSettings",
+          "filename": "app/admin/actions.ts"
+        }
+      },
+      "exportedName": "saveSiteSettings",
+      "filename": "app/admin/actions.ts"
+    },
+    "40c86c5be051ee588ac9c8dca3cdd307c8cf4053b9": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": 82421,
+          "async": false,
+          "exportedName": "saveProfile",
+          "filename": "app/admin/actions.ts"
+        }
+      },
+      "exportedName": "saveProfile",
+      "filename": "app/admin/actions.ts"
+    },
     "00b0c9417eb14aa0c684d9dd9b23e30b3f7fae05b5": {
       "workers": {
         "app/admin/page": {
-          "moduleId": 27447,
+          "moduleId": 82421,
           "async": false,
           "exportedName": "logoutAdmin",
           "filename": "app/admin/login/actions.ts"
